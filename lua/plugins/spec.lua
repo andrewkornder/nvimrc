@@ -67,9 +67,8 @@ return {
 		lazy = false,
 		build = ":TSUpdate",
 		config = function()
-			require("nvim-treesitter.configs").setup({
-				-- A list of parser names, or "all"
-				-- ensure_installed = "all",
+			require("nvim-treesitter.config").setup({
+                install_dir = vim.fn.stdpath("state") .. "/treesitter",
 				ensure_installed = {
 					"python",
 					"cpp",
@@ -117,25 +116,6 @@ return {
 	{
 		"neovim/nvim-lspconfig",
 		config = function()
-			local lspconfig = require("lspconfig")
-			-- lspconfig.basedpyright.setup({
-			-- 	basedpyright = {
-			-- 		analysis = {
-			-- 			autoImportCompletions = true,
-			-- 			autoSearchPaths = true,
-			-- 			diagnosticMode = "workspace",
-			-- 			typeCheckingMode = "basic", -- standard, strict, all, off, basic
-			-- 			ignore = { "*" },
-			-- 		},
-			-- 	},
-			-- })
-			lspconfig.pylsp.setup({})
-			lspconfig.clangd.setup({})
-			lspconfig.lua_ls.setup({})
-			lspconfig.ts_ls.setup({})
-			lspconfig.rust_analyzer.setup({})
-			lspconfig.jdtls.setup({})
-			lspconfig.jsonls.setup({})
 		end,
 		init = function()
 			local lspCapabilities = vim.lsp.protocol.make_client_capabilities()
@@ -156,7 +136,7 @@ return {
 					on_attach = lsp_on_attach[lsp], -- mostly disables some settings
 				}
 
-				require("lspconfig")[lsp].setup(config)
+				vim.lsp.config(lsp, config)
 			end
 		end,
 	},
@@ -208,7 +188,7 @@ return {
 	},
 	{
 		"linux-cultist/venv-selector.nvim",
-		branch = "regexp",
+		branch = "main",
 		dependencies = { "neovim/nvim-lspconfig", "nvim-telescope/telescope.nvim", "mfussenegger/nvim-dap-python" },
 		opts = {
 			name = { ".venv", "venv", "virtualenv" },
@@ -365,11 +345,14 @@ return {
 		},
 	},
 	{
-		"ggandor/leap.nvim",
+		"https://codeberg.org/andyg/leap.nvim",
 		dependencies = { "tpope/vim-repeat" },
 		lazy = false,
 		config = function()
-			require("leap").set_default_mappings()
+            vim.keymap.set({'n', 'x', 'o'}, 's', '<Plug>(leap)')
+            vim.keymap.set({'n', 'x', 'o'}, 'S', '<Plug>(leap-from-window)')
+            vim.keymap.set({'n', 'x', 'o'}, 'gs', '<Plug>(leap-cross-window)')
+
 			require("leap").opts.preview_filter = function(ch0, ch1, ch2)
 				return not (ch1:match("%s") or ch0:match("%a") and ch1:match("%a") and ch2:match("%a"))
 			end

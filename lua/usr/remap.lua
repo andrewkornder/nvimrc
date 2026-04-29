@@ -11,8 +11,8 @@ set({ "n", "v" }, "k", "gk", { desc = "Move up by display line" })
 set("n", "<leader>ex", vim.cmd.Ex)
 
 -- navigate tabs
-set("n", "<C-Left>", vim.cmd.tabprevious)
-set("n", "<C-Right>", vim.cmd.tabnext)
+set({"n", "t", "v"}, "<C-Tab>", vim.cmd.tabnext)
+set({"n", "t", "v"}, "<C-S-Tab>", vim.cmd.tabprevious)
 
 -- reload buffer
 set("n", "<leader>r", [[<cmd>e %<CR>]])
