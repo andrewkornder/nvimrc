@@ -67,8 +67,10 @@ return {
 		lazy = false,
 		build = ":TSUpdate",
 		config = function()
+            local runtime_path = vim.fn.stdpath("state") .. "/nvim-treesitter";
+            vim.opt.runtimepath:append(runtime_path)
 			require("nvim-treesitter.config").setup({
-                install_dir = vim.fn.stdpath("state") .. "/treesitter",
+                install_dir = runtime_path,
 				ensure_installed = {
 					"python",
 					"cpp",

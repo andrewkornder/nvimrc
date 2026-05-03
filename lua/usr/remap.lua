@@ -100,11 +100,14 @@ end)
 -- open nvim configs
 local config = vim.fn.stdpath("config")
 local function open_folder(map, path)
-	set("n", map, "<cmd>tabnew | " .. "cd " .. path .. " | e .<CR>gg8j")
+	set("n", map, "<cmd>tabnew | cd " .. path .. " | e .<CR>gg8j")
 end
 open_folder("<leader>cf", config)
 open_folder("<leader>cc", vim.user.code)
 open_folder("<leader>ct", "~/.config/fish")
+
+-- open msys terminal shell
+set("n", "<leader>mt", [[<cmd>term cmd "C:\\msys64\\msys2_shell.cmd -defterm -here -no-start -ucrt64"<CR>]])
 
 -- typos i make a lot with shift
 vim.api.nvim_create_user_command("E", "e", {})
@@ -124,6 +127,8 @@ set("n", "<leader>cP", function()
 end)
 
 -- fuzzy finder
+set({ "n", "v" }, "<leader>fr", "<cmd>FzfLua resume<CR>", { silent = true, desc = "resume search" })
+
 set({ "n", "v" }, "<leader>fs", "<cmd>FzfLua live_grep_native<CR>", { silent = true, desc = "grep in files" })
 set({ "v" }, "<leader>fw", "<cmd>FzfLua grep_visual<CR>", { silent = true, desc = "grep for selection in files" })
 
@@ -133,25 +138,31 @@ set({ "n", "v" }, "<leader>fF", function()
 	require("fzf-lua").files({ hidden = true })
 end, { silent = true, desc = "fuzzy complete path (with hidden files)" })
 
-set({ "n", "v" }, "<leader>ff", function()
-	require("fzf-lua").files({ hidden = false })
-end, { silent = true, desc = "fuzzy complete path (without hidden files)" })
+set({ "n", "v" }, "<leader>fg", "<cmd>FzfLua git_files<CR>", { silent = true, desc = "fuzzy find path in git-files (without hidden files)" })
+set({ "n", "v" }, "<leader>ff", "<cmd>FzfLua files<CR>", { silent = true, desc = "fuzzy find path (without hidden files)" })
 
 set({ "n", "v" }, "<leader>fb", "<cmd>FzfLua buffers<CR>", { silent = true, desc = "fuzzy complete buffer" })
 
 set({ "n" }, "<leader>fl", "<cmd>FzfLua blines<CR>", { silent = true, desc = "fuzzy line finding" })
 
 set({ "n", "v" }, "<leader>fk", "<cmd>FzfLua lsp_finder<CR>", { silent = true, desc = "find lsp" })
+set({ "n", "v" }, "<leader>ft", "<cmd>FzfLua lsp_workspace_diagnostics<CR>", { silent = true, desc = "find lsp diagnostics" })
 
 set({ "n" }, "<leader>fcp", "<cmd>FzfLua complete_path<CR>", { silent = true, desc = "complete path under cursor" })
 
 set({ "n" }, "<leader>fcf", "<cmd>FzfLua complete_file<CR>", { silent = true, desc = "complete file under cursor" })
+
+set({ "n" }, "<leader>fc", "<cmd>FzfLua colorschemes<CR>", { silent = true, desc = "complete file under cursor" })
+
+set({ "n" }, "<leader>fh", "<cmd>FzfLua helptags<CR>", { silent = true, desc = "complete file under cursor" })
 
 set({ "n" }, "<leader>op", function()
 	vim.fn.jobstart("open_in_explorer", {
 		cwd = vim.fn.getcwd(),
 	})
 end)
+
+-- TODO: broken obviously
 set({ "n" }, "<leader>tm", function()
 	vim.fn.jobstart("start_new_wsl_shell", {
 		cwd = vim.fn.stdpath("config"),

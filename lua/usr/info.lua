@@ -1,5 +1,5 @@
 vim.user = {
-	code = "~/code",
+	code = "/mnt/c/users/usr/downloads/code",
 	uv = "uv",
     python = "~/.venv/bin/python",
     cxx = "clang++",

@@ -26,42 +26,4 @@ local color_priority = {
 	"default",
 }
 
-local n = #color_priority
-
-function CycleColors(inc)
-	local current = vim.g.colors_name
-	if current == nil then
-		current = "default"
-	end
-
-	local next_color
-	for i, color in pairs(color_priority) do
-		if color == current then
-			i = math.fmod(i + inc - 1, n) + 1
-			if i == 0 then
-				i = n
-			end
-
-			next_color = color_priority[i]
-		end
-	end
-
-	vim.cmd.colorscheme(next_color)
-	print(string.format("%s -> %s", current, next_color))
-end
-
 vim.cmd.colorscheme(color_priority[1])
-
-vim.keymap.set({ "n", "v" }, "<leader>ccf", function()
-	CycleColors(1)
-end)
-vim.keymap.set({ "n", "v" }, "<leader>ccb", function()
-	CycleColors(-1)
-end)
-vim.keymap.set({ "n", "v" }, "<leader>cr", function()
-	vim.cmd.colorscheme(color_priority[1])
-end)
-
-vim.api.nvim_create_user_command("CycleColor", function()
-	CycleColors(1)
-end, {})
