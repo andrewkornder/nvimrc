@@ -32,6 +32,92 @@ return {
 	{ "nvim-lua/plenary.nvim", lazy = false, priority = 900 },
 
 	{
+		"willothy/flatten.nvim",
+		opts = {},
+		lazy = false,
+		priority = 1001,
+	},
+
+	{
+		"smjonas/inc-rename.nvim",
+		opts = {},
+	},
+	{
+		"NStefan002/screenkey.nvim",
+		lazy = false,
+		version = "*", -- or branch = "main", to use the latest commit
+		opts = {},
+		setup = function()
+			vim.cmd("Screenkey")
+		end,
+	},
+
+	{
+		"folke/snacks.nvim",
+		priority = 1000,
+		lazy = false,
+		---@type snacks.Config
+		opts = {
+			bigfile = { enabled = true },
+			explorer = { enabled = true, replace_netrw = false },
+			indent = { enabled = true },
+			image = { enabled = true },
+			notifier = { enabled = true },
+			quickfile = { enabled = true },
+			words = { enabled = true },
+		},
+		keys = {
+			{
+				"<leader>e",
+				function()
+					Snacks.explorer()
+				end,
+				desc = "File Explorer",
+			},
+		},
+		init = function()
+			vim.api.nvim_create_autocmd("User", {
+				pattern = "VeryLazy",
+				callback = function()
+					-- Setup some globals for debugging (lazy-loaded)
+					_G.dd = function(...)
+						Snacks.debug.inspect(...)
+					end
+					_G.bt = function()
+						Snacks.debug.backtrace()
+					end
+
+					-- Override print to use snacks for `:=` command
+					if vim.fn.has("nvim-0.11") == 1 then
+						vim._print = function(_, ...)
+							dd(...)
+						end
+					else
+						vim.print = _G.dd
+					end
+
+					-- Create some toggle mappings
+					Snacks.toggle.option("spell", { name = "Spelling" }):map("<leader>us")
+					Snacks.toggle.option("wrap", { name = "Wrap" }):map("<leader>uw")
+					Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map("<leader>uL")
+					Snacks.toggle.diagnostics():map("<leader>ud")
+					Snacks.toggle.line_number():map("<leader>ul")
+					Snacks.toggle
+						.option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 })
+						:map("<leader>uc")
+					Snacks.toggle.treesitter():map("<leader>uT")
+					Snacks.toggle
+						.option("background", { off = "light", on = "dark", name = "Dark Background" })
+						:map("<leader>ub")
+					Snacks.toggle.inlay_hints():map("<leader>uh")
+					Snacks.toggle.indent():map("<leader>ug")
+					Snacks.toggle.dim():map("<leader>uD")
+				end,
+			})
+		end,
+	},
+
+	{
 		"rmagatti/auto-session",
 		dependencies = { "nvim-telescope/telescope.nvim" },
 		lazy = false,
@@ -59,6 +145,17 @@ return {
 				grep_opts = "--binary-files=without-match --line-number --recursive --color=auto --perl-regexp -e",
 				rg_opts = "--pcre2 --column --line-number --no-heading --color=always --smart-case --max-columns=4096 -e",
 			},
+			previewers = {
+				builtin = {
+					extensions = {
+						["png"] = { "chafa" },
+						["jpg"] = { "chafa" },
+						["jpeg"] = { "chafa" },
+						["gif"] = { "chafa" },
+					},
+					ueberzug_port = nil, -- Only needed if using ueberzug
+				},
+			},
 		},
 	},
 
@@ -67,33 +164,40 @@ return {
 		lazy = false,
 		build = ":TSUpdate",
 		config = function()
-            local runtime_path = vim.fn.stdpath("state") .. "/nvim-treesitter";
-            vim.opt.runtimepath:append(runtime_path)
+			local runtime_path = vim.fn.stdpath("state") .. "/nvim-treesitter"
+			vim.opt.runtimepath:append(runtime_path)
 			require("nvim-treesitter.config").setup({
-                install_dir = runtime_path,
+				install_dir = runtime_path,
 				ensure_installed = {
-					"python",
-					"cpp",
-					"c",
-					"rust",
-					"java",
-					"lua",
-					"javascript",
-					"typescript",
-					"html",
-					"vim",
-					"bash",
-					"fish",
-					"cuda",
-					"css",
-					"llvm",
-					"make",
-					"cmake",
-					"json",
 					"asm",
-					"regex",
+					"bash",
+					"c",
+					"cmake",
+					"cpp",
+					"css",
+					"cuda",
+					"fish",
+					"html",
+					"java",
+					"javascript",
+					"json",
+					"latex",
+					"llvm",
+					"lua",
+					"make",
 					"markdown",
 					"markdown_inline",
+					"norg",
+					"python",
+					"regex",
+					"rust",
+					"scss",
+					"svelte",
+					"tsx",
+					"typescript",
+					"typst",
+					"vim",
+					"vue",
 				},
 				sync_install = false,
 				ignore_install = {},
@@ -117,8 +221,7 @@ return {
 	},
 	{
 		"neovim/nvim-lspconfig",
-		config = function()
-		end,
+		config = function() end,
 		init = function()
 			local lspCapabilities = vim.lsp.protocol.make_client_capabilities()
 
@@ -351,9 +454,9 @@ return {
 		dependencies = { "tpope/vim-repeat" },
 		lazy = false,
 		config = function()
-            vim.keymap.set({'n', 'x', 'o'}, 's', '<Plug>(leap)')
-            vim.keymap.set({'n', 'x', 'o'}, 'S', '<Plug>(leap-from-window)')
-            vim.keymap.set({'n', 'x', 'o'}, 'gs', '<Plug>(leap-cross-window)')
+			vim.keymap.set({ "n", "x", "o" }, "s", "<Plug>(leap)")
+			vim.keymap.set({ "n", "x", "o" }, "S", "<Plug>(leap-from-window)")
+			vim.keymap.set({ "n", "x", "o" }, "gs", "<Plug>(leap-cross-window)")
 
 			require("leap").opts.preview_filter = function(ch0, ch1, ch2)
 				return not (ch1:match("%s") or ch0:match("%a") and ch1:match("%a") and ch2:match("%a"))

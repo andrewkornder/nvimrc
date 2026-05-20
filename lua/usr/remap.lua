@@ -66,6 +66,9 @@ set("n", "<C-j>", "<cmd>cprev<CR>zz")
 set("n", "<leader>ga", "<cmd>lua vim.lsp.buf.code_action()<CR>")
 
 -- search and replace for current word
+set("n", "<leader>rn", function()
+  return ":IncRename " .. vim.fn.expand("<cword>")
+end, { expr = true })
 set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 set("n", "<leader>f", [[?\<<C-r><C-w>\>]])
 
@@ -115,6 +118,7 @@ vim.api.nvim_create_user_command("W", "w", {})
 vim.api.nvim_create_user_command("Wa", "wa", {})
 vim.api.nvim_create_user_command("Vs", "vs", {})
 vim.api.nvim_create_user_command("Q", "q", {})
+vim.api.nvim_create_user_command("Term", "q", {})
 
 -- copy path to file
 set("n", "<leader>cp", function()
